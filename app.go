@@ -30,12 +30,14 @@ func (a *App) MakeRoutes() {
 
 	router := mux.NewRouter().StrictSlash(true)
 	exportPath := "/export/db/{db}/schema/{schema}/table/{table}"
+
 	router.HandleFunc(exportPath, a.Export).Methods("POST")
 	routeRegLogger.WithFields(log.Fields{
 		"http-method":      "POST",
 		"function-handler": "app.Export",
 		"path":             exportPath,
 	}).Info("EXPORT")
+
 	importPath := "/import/db/{db}/schema/{schema}/table/{table}"
 	router.HandleFunc(importPath, a.Import).Methods("POST")
 	routeRegLogger.WithFields(log.Fields{
@@ -43,6 +45,15 @@ func (a *App) MakeRoutes() {
 		"function-handler": "app.Import",
 		"path":             importPath,
 	}).Info("IMPORT")
+
+	healthCheckPath := "/health"
+	router.HandleFunc(healthCheckPath, a.HealthCheck).Methods("GET")
+	routeRegLogger.WithFields(log.Fields{
+		"http-method":      "GET",
+		"function-handler": "app.HealthCheck",
+		"path":             healthCheckPath,
+	}).Info("HEALTH CHECK")
+
 	a.Router = router
 }
 
@@ -92,4 +103,8 @@ func (a *App) Import(w http.ResponseWriter, r *http.Request) {
 		go DoCallbackRequest(fmt.Sprintf(callBackImportUrl, importReq.db, importReq.schema, importReq.table), result)
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func (a *App) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
