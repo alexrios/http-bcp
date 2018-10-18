@@ -24,7 +24,7 @@ func Export(db string, schema string, table string) (string, error) {
 		"path":   bcpPath,
 	})
 	outputFile := fmt.Sprintf("%v/%v_%v_%v.txt", bcpPath, db, schema, table)
-	target := fmt.Sprintf("/opt/mssql-tools/bin/bcp %v.%v.%v out %v -c -t ';' -S %v -U %v -P %v",
+	target := fmt.Sprintf("/opt/mssql-tools/bin/bcp %v.%v.%v out %v -w -t ';' -S %v -U %v -P %v",
 		db, schema, table, outputFile, dbHost, dbUser, dbPw)
 	exportLogger.Info("Calling BCP routine")
 	return execute(target)
@@ -41,7 +41,7 @@ func Import(db string, schema string, table string) (string, error) {
 	})
 
 	outputFile := fmt.Sprintf("%v/%v_%v_%v.txt", bcpPath, db, schema, table)
-	target := fmt.Sprintf("/opt/mssql-tools/bin/bcp %v.%v.%v in %v -c -t ';' -S %v -U %v -P %v",
+	target := fmt.Sprintf("/opt/mssql-tools/bin/bcp %v.%v.%v in %v -w -t ';' -S %v -U %v -P %v",
 		db, schema, table, outputFile, dbHost, dbUser, dbPw)
 	importLogger.Info("Calling BCP routine")
 	return execute(target)
